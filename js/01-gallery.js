@@ -1,50 +1,48 @@
 import { galleryItems } from './gallery-items.js';
 
-const galleryContainer = document.querySelector('.gallery');
-const itemsMarkup = createGalleryItemsMarkup(galleryItems);
-galleryContainer.insertAdjacentHTML('beforeend', itemsMarkup);
-galleryContainer.addEventListener('click', onImgClick);
+// Change code below this line
 
-function createGalleryItemsMarkup(items) {
-  return items
-    .map(({ preview, original, description }) => {
-      return `<div class="gallery__item">
-  <a class="gallery__link" href="${original}">
-    <img
-      class="gallery__image"
-      src="${preview}"
-      data-source="${original}"
-      alt="${description}"
-    />
-  </a>
-</div>`;
-    })
+const galleryMarkUp = document.querySelector('.gallery');
+
+const galleryEl = galleryItems
+    .map(({ preview, description, original }) => 
+    `<div class="gallery__item">
+        <a class="gallery__link" href="${original}">
+            <img
+            class="gallery__image"
+            src="${preview}"
+            data-source="${original}"
+            alt="${description}"
+            />
+        </a>
+    </div>`)
     .join('');
-}
 
-const instance = basicLightbox.create(
-	`
-  <img width="1280" height="auto" src="">`,
-	{
-	  onShow: (instance) => {
-		window.addEventListener('keydown', onEscKeyPress);
-	  },
-	  onClose: (instance) => {
-		window.removeEventListener('keydown', onEscKeyPress);
-	  },
-	}
-  );
-  
-  function onImgClick(e) {
-	e.preventDefault();
-	const datasetSource = e.target.dataset.source;
-	if (!datasetSource) return;
-	instance.element().querySelector('img').src = datasetSource;
-	instance.show();
-  }
-  
-  function onEscKeyPress(e) {
-	if (e.code !== 'Escape') return;
-	instance.close();
-  }
+galleryMarkUp.insertAdjacentHTML('beforeend', galleryEl)
+
+galleryMarkUp.addEventListener('click', onImgClick)
+
+function onImgClick(evt) {
+    evt.preventDefault();
+
+    if (evt.target.nodeName !== 'IMG') {
+        return;
+    }
+
+    const modal = basicLightbox.create(
+        `<img src="${evt.target.dataset.source}" width="800" height="600">`,
+
+        {   onShow: () => window.addEventListener('keydown', onEscKeyPress),
+            onClose: () => window.removeEventListener('keydown', onEscKeyPress),
+        }
+    );
+    
+    modal.show();
+
+    function onEscKeyPress(evt) {   
+        if (evt.code === "Escape") {
+            modal.close();
+        }
+    }
+}
 
